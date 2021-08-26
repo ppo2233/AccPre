@@ -1,0 +1,31 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "Admin121314",
+      "password": "pbkdf2_sha256$120000$KVQ9sD4tSaXM$maJKcm8xlJrd/JAcEro3pEa+MJkMrFJf/bnqhYn7xEg=",
+      "last_login": "2021-08-26T16:10:09.562",
+      "is_superuser": true,
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@mail.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2021-08-26T16:07:09.562"
+    }
+  },
+  {
+    "model": "users.userprofile",
+    "pk": 1,
+    "fields": {
+      "name": "Admin",
+      "role": 1,
+      "failed": 0,
+      "created": "2021-08-26T16:07:09.562",
+      "modified": "2021-08-26T16:07:09.562",
+      "owner": 1,
+      "user": 1
+    }
+  }
+]

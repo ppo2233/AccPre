@@ -11,24 +11,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/ Articles
 """
 
 from pathlib import Path
+import datetime
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-lb^yn@#k(+fnf!2k^(99h9xy@@l+vur-*4zclm73$9lh(&bb^n'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
-
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -46,7 +34,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -71,11 +59,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'accpre.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -90,7 +73,16 @@ DATABASES = {
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
+    )
+}
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60 * 60 * 2)  # token有效时间
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -109,21 +101,21 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 USE_I18N = True
 USE_L10N = True
-USE_TZ = True
+USE_TZ = False
 
 STATIC_URL = '/static/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-USER_ROLE_COMMON = 1
+USER_ROLE_SUPER = 1
 USER_ROLE_MANAGEMENT = 2
-USER_ROLE_SUPER = 3
+USER_ROLE_COMMON = 3
+
 
 USER_ROLE_CHOICES = (
-    (USER_ROLE_COMMON, 'common'),
+    (USER_ROLE_SUPER, 'super'),
     (USER_ROLE_MANAGEMENT, 'management'),
-    (USER_ROLE_SUPER, 'super')
+    (USER_ROLE_COMMON, 'common')
 )
