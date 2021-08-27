@@ -13,8 +13,11 @@ class UserProfile(models.Model):
     failed = models.IntegerField('登录失败次数', default=0)
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
-    owner = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    owner = models.IntegerField('创建人', default=0)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.name}({self.id})'
 
 
 class Menu(models.Model):
@@ -27,3 +30,6 @@ class Menu(models.Model):
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name}({self.id})'

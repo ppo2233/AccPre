@@ -11,6 +11,9 @@ class Link(models.Model):
     modified = models.DateTimeField('修改时间', auto_now=True)
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
 
+    def __str__(self):
+        return f'{self.name}({self.id})'
+
 
 class Label(models.Model):
     """ 标签表 """
@@ -18,6 +21,9 @@ class Label(models.Model):
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name}({self.id})'
 
 
 class Classification(models.Model):
@@ -29,6 +35,9 @@ class Classification(models.Model):
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name}({self.id})'
 
 
 class Article(models.Model):
@@ -48,3 +57,6 @@ class Article(models.Model):
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.name}({self.id})'
