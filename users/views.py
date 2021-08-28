@@ -7,4 +7,3 @@ class UserProfileViewSet(AccPreViewSets):
     """ 用户 """
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    # query_fields = ''
