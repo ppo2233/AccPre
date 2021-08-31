@@ -13,8 +13,10 @@ class UserProfile(models.Model):
     failed = models.IntegerField('登录失败次数', default=0)
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
-    owner = models.IntegerField('创建人', default=0)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                related_name='user_profiles',
+                                related_query_name='user_profile')
 
     def __str__(self):
         return f'{self.name}({self.id})'

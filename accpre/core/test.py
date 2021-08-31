@@ -8,6 +8,7 @@ from accpre.core.utils import Utils
 
 class AccPreTestCaseBase(APITestCase):
     """ AccPre Test Case Base """
+    TEST_ADMIN_PASSWORD = 'admin123'
 
     def create_instances(self, instances, class_name):
         """ 创建 model instance """
@@ -27,17 +28,20 @@ class AccPreTestCaseBase(APITestCase):
 
     def setUp(self):
         """ 初始化 """
-        self.users = self.create_instances([
+        # 初始化auth user
+        self.users_data = [
             {
                 'username': f'admin_01_{random.random()}',
-                'password': 'admin123'
+                'password': self.TEST_ADMIN_PASSWORD
             },
             {
                 'username': f'admin_02_{random.random()}',
-                'password': 'admin123'
+                'password': self.TEST_ADMIN_PASSWORD
             }
-        ], 'user')
+        ]
+        self.users = self.create_instances(self.users_data, 'User')
 
+        # 初始化user_profile
         self.user_profiles = self.create_instances(
             [
                 {
@@ -56,4 +60,14 @@ class AccPreTestCaseBase(APITestCase):
 
 class AccPreTest(AccPreTestCaseBase):
     """ AccPre Test """
-    pass
+    def setUp(self):
+        super().setUp()
+        Utils.init_password_grant_application()  # 初始化测试令牌组
+        res = Utils.create_token(self.users[0].username, self.users_data[0]['password'])  # 初始化token
+
+        # 获取token请求头
+        self.auth_header = {
+            f"Authorization": "Bearer {}".format(
+                Utils.json_loads(res['token'])['access_token']
+            )
+        }

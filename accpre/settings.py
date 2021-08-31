@@ -11,12 +11,19 @@ https://docs.djangoproject.com/en/3.2/ref/settings/ Articles
 """
 
 from pathlib import Path
-import datetime
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-lb^yn@#k(+fnf!2k^(99h9xy@@l+vur-*4zclm73$9lh(&bb^n'
 DEBUG = True
 ALLOWED_HOSTS = []
+
+# 用户认证
+CLIENT_ID = "WJ6rAkO4r0iKWtsm2dtmFVySlxHccIt90M47uWO4"
+CLIENT_SECRET = "pe843MRWfCylspXhveCygCMuzAcInpQboQf6a8PRp03Bg7DMTZQe"
+
+# 超级管理员账号：admin
+# 明文密码：admin123
+# 密文：pbkdf2_sha256$260000$bC92BKCzTNtUSfuSSJadwz$5s9b6dZASJvmmQ9NU7OGabA1cQCjUjnGNWRR06mU0KY =
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -28,18 +35,21 @@ INSTALLED_APPS = [
     'blogs.apps.BlogsConfig',
     'users.apps.UsersConfig',
     'rest_framework',
+    'oauth2_provider',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # 跨域
 ]
-
+CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = 'accpre.urls'
 
 TEMPLATES = [
@@ -72,17 +82,17 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'accpre.core.permissions.AccPreIsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication'
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
     )
 }
 
-JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=60 * 60 * 2)  # token有效时间
+# token 过期时间
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 60 * 60 * 24 * 30
+
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -119,3 +129,15 @@ USER_ROLE_CHOICES = (
     (USER_ROLE_MANAGEMENT, 'management'),
     (USER_ROLE_COMMON, 'common')
 )
+
+DEFAULT_OAUTH_TOKEN_URL = '/oauth/token/'
+DEFAULT_OAUTH_TOKEN_REQUEST_METHOD = 'POST'
+DEFAULT_OAUTH_TOKEN_BODY = "username={username}" \
+                           "&password={password}" \
+                           "&grant_type=password" \
+                           "&client_id={client_id}" \
+                           "&client_secret={client_secret}"
+DEFAULT_VARCHAR_LENGTH = 20
+CERTIFICATION_PASS_LIST = [
+    '/login/',  # 登录
+]
