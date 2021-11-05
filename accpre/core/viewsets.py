@@ -21,36 +21,27 @@ class AccPreGenericValidate:
             'msg': status_codes.CODE_MSG[code].format(param=param_info)
         })
 
+    def _raise(self, code, mgs, raisor=AccPreException):
+        """ 抛出异常 """
+        raise raisor(self.generic_err_msg(code, mgs))
+
     def validate_param_is_none(self, param_value, param_name):
         """ 验证参数是否为空 """
         if Utils.is_param_none(param_value):
-            raise AccPreException(
-                self.generic_err_msg(
-                    status_codes.PARAM_IS_NULL_CODE, param_name
-                )
-            )
+            self._raise(status_codes.PARAM_IS_NULL_CODE, param_name)
 
     def validate_param_length(self, param_value, param_name):
         """ 验证字符长度 """
         if not Utils.is_allow_length(param_value):
-            raise AccPreException(
-                self.generic_err_msg(
-                    status_codes.PARAM_LENGTH_ERR_CODE, param_name
-                )
-            )
+            self._raise(status_codes.PARAM_LENGTH_ERR_CODE, param_name)
 
     def validate_name_is_duplicate(self, model, param_name, pk=None, **params):
         """ 验证名称是否重复 """
         query = model.objects.filter(**params)
         if pk is not None:
             query = query.exclude(pk=pk)
-
         if query:
-            raise AccPreException(
-                self.generic_err_msg(
-                    status_codes.PARAM_IS_DUPLICATED, param_name
-                )
-            )
+            self._raise(status_codes.PARAM_IS_DUPLICATED, param_name)
 
 
 class AccPreBaseViewSets(viewsets.ModelViewSet, AccPreGenericValidate):
