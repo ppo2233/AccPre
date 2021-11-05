@@ -19,6 +19,7 @@ class UserProfileViewSet(AccPreViewSets):
     """ 用户 """
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+    fields = ['name', 'role', 'failed', 'created', 'modified']
 
     def before_create(self, request, *args, **kwargs):
         """ 创建前 """

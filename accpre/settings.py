@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/ Articles
 """
+import os
 
 from pathlib import Path
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-lb^yn@#k(+fnf!2k^(99h9xy@@l+vur-*4zclm73$9lh(&bb^n'
@@ -54,9 +56,9 @@ ROOT_URLCONF = 'accpre.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',  # 定义模板引擎
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # 模板路径
+        'APP_DIRS': True,  # 是否在app里查找模板
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -81,6 +83,8 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': [
         'accpre.core.permissions.AccPreIsAuthenticated'
     ],
@@ -141,3 +145,6 @@ DEFAULT_VARCHAR_LENGTH = 20
 CERTIFICATION_PASS_LIST = [
     '/login/',  # 登录
 ]
+
+DEFAULT_ORDER = '-created'
+CONTAINS_QUERY_FIELDS = ['name', 'role', 'failed', 'created', 'modified']

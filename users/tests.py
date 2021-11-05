@@ -57,6 +57,51 @@ class UserTest(AccPreTest):
             }
         ], 'UserProfile')
 
+    def test_login_user(self):
+        """
+        测试用户登录用例：
+            # 账号密码正确
+            # 账号有误
+            # 密码有误
+        """
+        # 账号密码正确
+        url = reverse('users:userprofile-login')
+        data = {
+            'username': self.users[0].username,
+            'password': self.users_data[0]['password']
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], 0, response_data)
+        self.assertTrue(response_data['data']['token'], response_data)
+
+        # 账号有误
+        url = reverse('users:userprofile-login')
+        data = {
+            'username': 'error',
+            'password': self.users_data[0]['password']
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], -1, response_data)
+        self.assertEqual(response_data['err_code'], '0100', response_data)
+        self.assertIn('username', response_data['msg'], response_data)
+
+        # 密码有误
+        url = reverse('users:userprofile-login')
+        data = {
+            'username': self.users[0].username,
+            'password': 'error'
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], -1, response_data)
+        self.assertEqual(response_data['err_code'], '0100', response_data)
+        self.assertIn('password', response_data['msg'], response_data)
+
     def test_create_user(self):
         """
         测试创建用户用例：
@@ -67,11 +112,9 @@ class UserTest(AccPreTest):
             # 登录名为空
             # 登录名重复
             # 登录名字符超过20
-            # 正常创建（超级管理员）（用户权限）
+            # 正常创建（超级管理员）
             # TODO 密码为空
             # TODO 密码不一致
-            # TODO 正常创建（管理员）（用户权限）
-            # TODO 非管理用户创建（用户权限）
         """
         url = reverse('users:userprofile-list')
 
@@ -162,7 +205,7 @@ class UserTest(AccPreTest):
         self.assertEqual(response_data['err_code'], '0003', response_data)
         self.assertIn('username', response_data['msg'], response_data)
 
-        # 正常创建（超级管理员）（用户权限）
+        # 正常创建（超级管理员）
         data = {
             'name': 'xq_06',
             'username': 'xq_06',
@@ -177,51 +220,6 @@ class UserTest(AccPreTest):
         self.assertEqual(validate_data['name'], data['name'], validate_data)
         self.assertEqual(validate_data['role'], 1, validate_data)
 
-    def test_login_user(self):
-        """
-        测试用户登录用例：
-            # 账号密码正确
-            # 账号有误
-            # 密码有误
-        """
-        # 账号密码正确
-        url = reverse('users:userprofile-login')
-        data = {
-            'username': self.users[0].username,
-            'password': self.users_data[0]['password']
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
-        response_data = Utils.json_loads(response.content)
-        self.assertEqual(response_data['code'], 0, response_data)
-        self.assertTrue(response_data['data']['token'], response_data)
-
-        # 账号有误
-        url = reverse('users:userprofile-login')
-        data = {
-            'username': 'error',
-            'password': self.users_data[0]['password']
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
-        response_data = Utils.json_loads(response.content)
-        self.assertEqual(response_data['code'], -1, response_data)
-        self.assertEqual(response_data['err_code'], '0100', response_data)
-        self.assertIn('username', response_data['msg'], response_data)
-
-        # 密码有误
-        url = reverse('users:userprofile-login')
-        data = {
-            'username': self.users[0].username,
-            'password': 'error'
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
-        response_data = Utils.json_loads(response.content)
-        self.assertEqual(response_data['code'], -1, response_data)
-        self.assertEqual(response_data['err_code'], '0100', response_data)
-        self.assertIn('password', response_data['msg'], response_data)
-
     def test_update_user(self):
         """
         测试修改用户用例：
@@ -231,20 +229,51 @@ class UserTest(AccPreTest):
             # 登录名字符超过20
             # 密码为空
             # 密码不一致
-            # 正常修改（当前用户）（用户权限）
-            # 正常修改（超级管理员）（用户权限）
-            # 异常修改（管理员操作其他用户）（用户权限）
-            # 非管理员非当前用户修改（用户权限）
         """
 
     def test_destroy_user(self):
-        """
-        测试删除用户用例：
-            # 正常删除（当前用户）（用户权限）
-            # 正常删除（超级管理员）（用户权限）
-            # 异常删除（管理员操作其他用户）（用户权限）
-            # 非管理员非当前用户修改（用户权限）
-        """
+        """ 测试删除用户 """
 
     def test_user_query(self):
         """ 测试用户查询 """
+        # 查询列表
+        url = reverse("users:userprofile-list")
+        response = self.client.get(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['count'], 6, response_data)
+
+        # 模糊查询
+        url = '{}{}'.format(reverse("users:userprofile-list"), '?name=name_')
+        response = self.client.get(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['count'], 2, response_data)
+
+        # 分页
+        url = '{}{}'.format(reverse("users:userprofile-list"), '?offset=0&limit=1')
+        response = self.client.get(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(len(response_data['results']), 1, response_data)
+        self.assertEqual(response_data['count'], 6, response_data)
+        self.assertTrue(response_data['next'], response_data)
+
+        # 分页排序
+        url = '{}{}'.format(reverse("users:userprofile-list"), '?offset=0&limit=2&order=-name')
+        response = self.client.get(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['results'][0]['name'], 'super_admin')
+        self.assertEqual(len(response_data['results']), 2, response_data)
+        self.assertEqual(response_data['count'], 6, response_data)
+        self.assertTrue(response_data['next'], response_data)
+
+        url = '{}{}'.format(reverse("users:userprofile-list"), '?offset=0&limit=2&order=name')
+        response = self.client.get(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['results'][0]['name'], 'admin_user')
+        self.assertEqual(len(response_data['results']), 2, response_data)
+        self.assertEqual(response_data['count'], 6, response_data)
+        self.assertTrue(response_data['next'], response_data)
