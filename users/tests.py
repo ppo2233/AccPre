@@ -3,6 +3,7 @@ from django.urls import reverse
 
 from accpre.core.test import AccPreTest
 from accpre.core.utils import Utils
+from users.models import UserProfile
 
 
 class UserTest(AccPreTest):
@@ -225,14 +226,51 @@ class UserTest(AccPreTest):
         测试修改用户用例：
             # 昵称为空
             # 昵称字符超过20
-            # 登录名为空
-            # 登录名字符超过20
             # 密码为空
             # 密码不一致
         """
 
+        # 修改前登录验证
+        url_1 = reverse('users:userprofile-login')
+        password_1 = 'super_admin_123'
+        data_1 = {
+            'username': self.users[0].username,
+            'password': password_1
+        }
+
+        response = self.client.post(url_1, data=data_1, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], 0, response_data)
+        self.assertTrue(response_data['data']['token'], response_data)
+
+        # 修改密码
+        data_2 = {
+            'password': 'super_admin_123_update'
+        }
+        url = reverse('users:userprofile-detail', args=(self.user_profiles[0].id, ))
+        response = self.client.put(url, data_2, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], 0, response_data)
+
+        # 修改密码后登录验证
+        response = self.client.post(url_1, data=data_1, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], -1, response_data)
+        self.assertEqual(response_data['err_code'], '0100', response_data)
+        self.assertIn('password is error', response_data['msg'], response_data)
+
     def test_destroy_user(self):
         """ 测试删除用户 """
+        self.assertEqual(UserProfile.objects.all().count(), 6)
+        pk = self.user_profiles[0].id
+        url = reverse('users:userprofile-detail', args=(pk,))
+        response = self.client.delete(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        self.assertEqual(UserProfile.objects.all().count(), 5)
+        self.assertFalse(UserProfile.objects.filter(pk=pk))
 
     def test_user_query(self):
         """ 测试用户查询 """

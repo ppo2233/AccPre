@@ -35,6 +35,16 @@ class UserProfileViewSet(AccPreViewSets):
 
         return user, data
 
+    def after_create(self, instance, request, *args, **kwargs):  # 添加创建后钩子
+        self.create_token_group(instance.user.username)  # 创建令牌组
+
+    def before_update(self, userprofile_instance):
+        """ 修改 """
+        password = self.request.data.get('password', None)
+        name = self.request.data.get('name', userprofile_instance.name)
+        self.validate_name(name, pk=userprofile_instance.id)
+        self.update_auth_user(userprofile_instance, password)
+
     def get_request_mutable_data(self, request):
         """ 获取可边data """
         data = request.data
@@ -48,14 +58,22 @@ class UserProfileViewSet(AccPreViewSets):
         """ 创建auth user """
         return User.objects.create_user(username=username, password=password)
 
-    def after_create(self, instance, request, *args, **kwargs):  # 添加创建后钩子
-        self.create_token_group(instance.user.username)  # 创建令牌组
+    def update_auth_user(self, userprofile_instance, password):
+        """ 修改用户 """
+        self.update_password(userprofile_instance, password)  # 修改密码
+
+    def update_password(self, userprofile_instance, password):
+        """ 修改密码 """
+        if userprofile_instance and password:
+            user = userprofile_instance.user
+            user.set_password(password)
+            user.save()
 
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         """ rewrite Create a model instance. """
         try:
-            _, data = self.before_create(request, *args, **kwargs)  # 添加创建前钩子
+            _, data = self.before_create(request, *args, **kwargs)
             serializer = self.get_serializer(data=data)
             serializer.is_valid(raise_exception=True)
             instance = self.perform_create(serializer)
@@ -64,10 +82,8 @@ class UserProfileViewSet(AccPreViewSets):
         except AccPreException as ae:
             ae = Utils.json_loads(str(ae))
             return Response(msg=ae['msg'], err_code=ae['err_code'])
-
         except Exception as e:
             return Response(msg=str(e), err_code=status_codes.UNKNOWN_ERROR)
-
         return Response(data=serializer.data, headers=headers)
 
     def create_token_group(self, username):
@@ -88,11 +104,11 @@ class UserProfileViewSet(AccPreViewSets):
         self.validate_param_length(username, 'username')
         self.validate_name_is_duplicate(User, 'username', **{'username': username})
 
-    def validate_name(self, name):
+    def validate_name(self, name, pk=None):
         """ 用户昵称验证 """
         self.validate_param_is_none(name, 'name')
         self.validate_param_length(name, 'name')
-        self.validate_name_is_duplicate(UserProfile, 'name', **{'name': name})
+        self.validate_name_is_duplicate(UserProfile, 'name', pk=pk, **{'name': name})
 
     def validates(self, user_profile, username, name):
         """ 验证 """
@@ -100,22 +116,39 @@ class UserProfileViewSet(AccPreViewSets):
         self.validate_username(username)  # 用户登录名验证
         self.validate_name(name)  # 用户昵称验证
 
+    def update(self, request, *args, **kwargs):
+        """ 重写修改方法 """
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            self.before_update(instance)  # 修改前钩子
+            data = self.get_request_mutable_data(request)
+            if 'user' not in data:
+                data['user'] = instance.user.id
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            self.after_update(instance)  # 修改后钩子
+        except AccPreException as ae:
+            ae = Utils.json_loads(str(ae))
+            return Response(msg=ae['msg'], err_code=ae['err_code'])
+        except Exception as e:
+            print(traceback.format_exc())
+            return Response(err_code=status_codes.UNKNOWN_ERROR, msg=str(e))
+        return Response(serializer.data)
+
     @action(methods=['post'], detail=False)
     def login(self, request):
         """ 登录 """
         try:
             username = request.data.get('username', None)
             password = request.data.get('password', None)
-
             user = authenticate(request, username=username, password=password)
             if not user:
                 code = status_codes.USER_OR_PASSWORD_ERROR_CODE
                 return Response(err_code=code, msg=status_codes.CODE_MSG[code])
-
             res = Utils.create_token(username, password)
-
         except Exception as e:
             code = status_codes.UNKNOWN_ERROR
             return Response(err_code=code, msg=f'{e}')
-
         return Response(res)
