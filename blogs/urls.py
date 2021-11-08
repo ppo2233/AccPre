@@ -7,9 +7,11 @@ from blogs import views
 app_name = 'blogs'
 router = routers.DefaultRouter()
 
-router.register(r'blogs', views.LabelViewSet)
+router.register(r'labels', views.LabelViewSet)
+router.register(r'links', views.LinkViewSet)
+router.register(r'classifications', views.ClassificationViewSet)
+router.register(r'articles', views.ArticleViewSet)
 
 urlpatterns = [
     url(r'^', include(router.urls))
 ]
-

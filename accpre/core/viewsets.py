@@ -64,15 +64,19 @@ class AccPreViewSets(AccPreBaseViewSets):
 
     def before_delete(self):
         """ 删除前 """
+        pass
 
     def after_delete(self):
         """ 删除后 """
+        pass
 
     def before_update(self, instance):
         """ 修改前 """
+        pass
 
     def after_update(self, instance):
         """ 修改后 """
+        pass
 
     def perform_create(self, serializer):
         """ 执行创建保存 """
@@ -155,7 +159,6 @@ class AccPreViewSets(AccPreBaseViewSets):
             return Response(msg=ae['msg'], err_code=ae['err_code'])
 
         except Exception as e:
-            print(traceback.format_exc())
             return Response(err_code=status_codes.UNKNOWN_ERROR, msg=str(e))
 
         return Response(serializer.data)

@@ -32,6 +32,7 @@ class Classification(models.Model):
     parent = models.ForeignKey("self", on_delete=models.CASCADE, null=True, blank=True)
     level = models.IntegerField('层数', default=0)
     is_root = models.BooleanField('是否为根', default=False)
+    priority = models.IntegerField('优先级', default=0)
     created = models.DateTimeField('创建时间', auto_now_add=True)
     modified = models.DateTimeField('修改时间', auto_now=True)
     owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
