@@ -1,18 +1,23 @@
 import traceback
+import logging
 
 from rest_framework.decorators import action
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.forms.models import model_to_dict
 
 from accpre.core.responses import Response
 from accpre.core.viewsets import AccPreViewSets
-from users.models import UserProfile
+from users.models import UserProfile, Menu
 from users.serializers import UserProfileSerializer
 from accpre import settings
 from accpre.core.utils import Utils
 from accpre.core.exceptions import AccPreException
 from accpre.core import status_codes
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserProfileViewSet(AccPreViewSets):
@@ -133,7 +138,6 @@ class UserProfileViewSet(AccPreViewSets):
             ae = Utils.json_loads(str(ae))
             return Response(msg=ae['msg'], err_code=ae['err_code'])
         except Exception as e:
-            print(traceback.format_exc())
             return Response(err_code=status_codes.UNKNOWN_ERROR, msg=str(e))
         return Response(serializer.data)
 
@@ -152,3 +156,37 @@ class UserProfileViewSet(AccPreViewSets):
             code = status_codes.UNKNOWN_ERROR
             return Response(err_code=code, msg=f'{e}')
         return Response(res)
+
+    def get_top_menus(self):
+        """ 获取顶级菜单 """
+        order = self.get_default_order_filed()
+        return [m for m in Menu.objects.filter(parent=None).exclude(name='').order_by(order)]
+
+    def get_sub_menus(self, parents):
+        """ 获取子菜单 """
+        order = self.get_default_order_filed()
+        data = []
+        for p in parents:  # 一级菜单
+            p_dict = model_to_dict(p)
+            p_dict['subs'] = []
+            subs = Menu.objects.filter(parent=p).exclude(name='').order_by(order)
+            for s in subs:  # 二级菜单
+                s_dict = model_to_dict(s)
+                p_dict['subs'].append(s_dict)
+            data.append(p_dict)
+        return data
+
+    def get_default_order_filed(self):
+        """ 获取默认排序字段 """
+        return 'priority'
+
+    @action(methods=['post'], detail=False)
+    def get_menus(self, request):
+        """ 获取菜单 """
+        try:
+            first_levels = self.get_top_menus()
+            data = self.get_sub_menus(first_levels)
+        except Exception as e:
+            code = status_codes.UNKNOWN_ERROR
+            return Response(err_code=code, msg=f'{e}')
+        return Response(data)

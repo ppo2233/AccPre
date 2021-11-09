@@ -1,0 +1,184 @@
+[
+  {
+    "model": "users.menu",
+    "pk": 1,
+    "fields": {
+      "name": "系统管理",
+      "parent": null,
+      "url": "www",
+      "level": 0,
+      "priority": 0,
+      "is_root": true,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 2,
+    "fields": {
+      "name": "博客管理",
+      "parent": null,
+      "url": "www",
+      "level": 0,
+      "priority": 1,
+      "is_root": true,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 3,
+    "fields": {
+      "name": "",
+      "parent": null,
+      "url": "",
+      "level": 0,
+      "priority": 2,
+      "is_root": true,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 4,
+    "fields": {
+      "name": "",
+      "parent": null,
+      "url": "",
+      "level": 0,
+      "priority": 3,
+      "is_root": true,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 5,
+    "fields": {
+      "name": "",
+      "parent": null,
+      "url": "",
+      "level": 0,
+      "priority": 4,
+      "is_root": true,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 6,
+    "fields": {
+      "name": "",
+      "parent": null,
+      "url": "",
+      "level": 0,
+      "priority": 15,
+      "is_root": true,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 10,
+    "fields": {
+      "name": "用户管理",
+      "parent": 1,
+      "url": "www",
+      "level": 1,
+      "priority": 0,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 11,
+    "fields": {
+      "name": "",
+      "parent": 1,
+      "url": "",
+      "level": 1,
+      "priority": 1,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 12,
+    "fields": {
+      "name": "",
+      "parent": 1,
+      "url": "",
+      "level": 1,
+      "priority": 2,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 20,
+    "fields": {
+      "name": "标签管理",
+      "parent": 2,
+      "url": "www",
+      "level": 1,
+      "priority": 0,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 21,
+    "fields": {
+      "name": "分类管理",
+      "parent": 2,
+      "url": "www",
+      "level": 1,
+      "priority": 1,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 22,
+    "fields": {
+      "name": "链接管理",
+      "parent": 2,
+      "url": "www",
+      "level": 1,
+      "priority": 3,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  },
+  {
+    "model": "users.menu",
+    "pk": 23,
+    "fields": {
+      "name": "文章管理",
+      "parent": 2,
+      "url": "www",
+      "level": 1,
+      "priority": 4,
+      "is_root": false,
+      "created": "2021-08-26T16:10:09.562",
+      "modified": "2021-08-26T16:10:09.562"
+    }
+  }
+]

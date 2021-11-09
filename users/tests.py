@@ -8,6 +8,8 @@ from users.models import UserProfile
 
 class UserTest(AccPreTest):
     """ User 的单元测试 """
+    fixtures = ['00.initializer_menus.json']
+
     def setUp(self):
         super(UserTest, self).setUp()
 
@@ -315,3 +317,11 @@ class UserTest(AccPreTest):
         self.assertEqual(len(response_data['results']), 2, response_data)
         self.assertEqual(response_data['count'], 6, response_data)
         self.assertTrue(response_data['next'], response_data)
+
+    def test_get_menus(self):
+        """ 测试获取菜单 """
+        url = reverse('users:userprofile-get-menus')
+        response = self.client.post(url, **self.auth_header)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+        response_data = Utils.json_loads(response.content)
+        self.assertEqual(response_data['code'], 0, response_data)
